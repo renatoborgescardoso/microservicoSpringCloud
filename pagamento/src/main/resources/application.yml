@@ -11,6 +11,11 @@ spring:
     username: root
     password: admin
     driverClassName: org.hibernate.dialect.MariaDB10Dialect
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
   jpa:
     show-sql: false
@@ -18,3 +23,7 @@ spring:
       ddl-auto: update
   jmx:
     enabled: false
+produto:
+  rabbitmq:
+    exchange: produto.exchange
+    queue: produto.queue

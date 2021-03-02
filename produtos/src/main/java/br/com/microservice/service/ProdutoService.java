@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.microservice.config.ProdutoSendMessage;
 import br.com.microservice.data.vo.ProdutoVO;
 import br.com.microservice.entity.Produto;
 import br.com.microservice.exception.ResourceNotFoundException;
@@ -17,14 +18,18 @@ import br.com.microservice.repository.ProdutoRepository;
 public class ProdutoService {
 
 	private ProdutoRepository produtoRepository;
+	private ProdutoSendMessage produtoSendMessage;
 
 	@Autowired
-	public ProdutoService(ProdutoRepository produtoRepository) {
+	public ProdutoService(ProdutoRepository produtoRepository, ProdutoSendMessage produtoSendMessage) {
 		this.produtoRepository = produtoRepository;
+		this.produtoSendMessage = produtoSendMessage;
 	}
 
 	public ProdutoVO save(ProdutoVO produtoVO) {
-		return ProdutoVO.create(this.produtoRepository.save(Produto.create(produtoVO)));
+		ProdutoVO obj = ProdutoVO.create(this.produtoRepository.save(Produto.create(produtoVO)));
+		produtoSendMessage.send(obj);
+		return obj;
 	}
 
 	public ProdutoVO update(ProdutoVO produtoVO) {
