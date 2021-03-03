@@ -10,6 +10,6 @@ import br.com.microservice.autenticacao.entity.Permission;
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
-	@Query("SELECT p FROM Permission WHERE p.description =:description")
+	@Query("SELECT p FROM Permission p WHERE p.description =:description")
 	Permission findByDescription(@Param("description") String description);
 }

@@ -17,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -66,5 +68,18 @@ public class JwtTokenProvider {
 			return bearerToken.substring(7, bearerToken.length());
 		}
 		return null;
+	}
+	
+	public boolean validateToken(String token) {
+		try {
+			Jws<Claims> clJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+			if (clJws.getBody().getExpiration().before(new Date())) {
+				return false;
+			}
+		} catch (JwtException | IllegalArgumentException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

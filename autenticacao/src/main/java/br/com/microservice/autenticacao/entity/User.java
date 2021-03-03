@@ -42,10 +42,10 @@ public class User implements UserDetails, Serializable {
 	private Boolean credentialsNonExpired;
 
 	private Boolean enabled;
-	
+
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "user_permission", joinColumns = {@JoinColumn(name="id_user")},
-			inverseJoinColumns = {@JoinColumn(name="id_permission")})
+	@JoinTable(name = "user_permission", joinColumns = { @JoinColumn(name = "id_user") }, inverseJoinColumns = {
+			@JoinColumn(name = "id_permission") })
 	private List<Permission> permissions;
 
 	public Long getId() {
@@ -97,7 +97,39 @@ public class User implements UserDetails, Serializable {
 	public boolean isEnabled() {
 		return this.enabled;
 	}
-	
+
+	public Boolean getAccountNonExpired() {
+		return accountNonExpired;
+	}
+
+	public void setAccountNonExpired(Boolean accountNonExpired) {
+		this.accountNonExpired = accountNonExpired;
+	}
+
+	public Boolean getAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	public void setAccountNonLocked(Boolean accountNonLocked) {
+		this.accountNonLocked = accountNonLocked;
+	}
+
+	public Boolean getCredentialsNonExpired() {
+		return credentialsNonExpired;
+	}
+
+	public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+		this.credentialsNonExpired = credentialsNonExpired;
+	}
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public List<String> getRoles() {
 		List<String> roles = new ArrayList<>();
 		this.permissions.stream().forEach(p -> {
