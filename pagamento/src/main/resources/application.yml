@@ -27,3 +27,7 @@ produto:
   rabbitmq:
     exchange: produto.exchange
     queue: produto.queue
+security:
+  jwt:
+    token:
+      secret-key: chave-microservice

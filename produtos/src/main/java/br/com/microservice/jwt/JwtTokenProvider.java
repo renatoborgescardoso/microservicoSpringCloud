@@ -1,27 +1,23 @@
-package br.com.microservice.autenticacao.jwt;
+package br.com.microservice.jwt;
 
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
 
 @Service
 public class JwtTokenProvider {
@@ -29,39 +25,54 @@ public class JwtTokenProvider {
 	@Value("${security.jwt.token.secret-key}")
 	private String secret;
 
-	@Value("${security.jwt.token.expired}")
-	private long expired;
-	
-	@Autowired
-	@Qualifier("userService")
-	private UserDetailsService userDetailsService;
-
 	@PostConstruct
 	protected void init() {
 		secret = Base64.getEncoder().encodeToString(secret.getBytes());
 	}
-	
-	
-	public String createToken(String userName, List<String> roles) {
-		Claims claims = Jwts.claims().setSubject(userName);
-		claims.put("roles", roles);
-		
-		Date now = new Date();
-		Date validateToken = new Date(now.getTime() + expired);
-		
-		return Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(validateToken)
-				.signWith(SignatureAlgorithm.HS512, secret).compact();
-	}
-	
+
 	public Authentication getAuthentication(String token) {
-		UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUserNameByToken(token));
+		UserDetails userDetails = new UserDetails() {
+
+			private static final long serialVersionUID = 599195559527985488L;
+
+			@Override
+			public boolean isEnabled() {
+				return true;
+			}
+
+			@Override
+			public boolean isCredentialsNonExpired() {
+				return true;
+			}
+
+			@Override
+			public boolean isAccountNonLocked() {
+				return true;
+			}
+
+			@Override
+			public boolean isAccountNonExpired() {
+				return true;
+			}
+
+			@Override
+			public String getUsername() {
+				return "";
+			}
+
+			@Override
+			public String getPassword() {
+				return "";
+			}
+
+			@Override
+			public Collection<? extends GrantedAuthority> getAuthorities() {
+				return null;
+			}
+		};
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
-	
-	private String getUserNameByToken(String token) {
-		return Jwts.parser().setSigningKey(secret).parseClaimsJwt(token).getBody().getSubject();
-	}
-	
+
 	public String resolveToken(HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
 		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -69,7 +80,7 @@ public class JwtTokenProvider {
 		}
 		return null;
 	}
-	
+
 	public boolean validateToken(String token) {
 		try {
 			Jws<Claims> clJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);

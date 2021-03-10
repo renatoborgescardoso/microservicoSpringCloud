@@ -1,4 +1,4 @@
-package br.com.microservice.autenticacao.security;
+package br.com.microservice.pagamento.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import br.com.microservice.autenticacao.jwt.JwtConfigure;
-import br.com.microservice.autenticacao.jwt.JwtTokenProvider;
+import br.com.microservice.pagamento.jwt.JwtConfigure;
+import br.com.microservice.pagamento.jwt.JwtTokenProvider;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.httpBasic().disable()
 		.csrf().disable().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and().authorizeRequests().antMatchers("/login").permitAll()
+				.and().authorizeRequests().anyRequest().authenticated()
 				.and().apply(new JwtConfigure(this.jwtTokenProvider));
 	}
 
